@@ -22,10 +22,11 @@ def fetch_housing_data(housing_url=HOUSING_URL, housing_path=HOUSING_PATH):
 import pandas as pd
 
 def load_housing_data(housing_path=HOUSING_PATH):
+    fetch_housing_data()
     csv_path = os.path.join(housing_path, "housing.csv")
     return pd.read_csv(csv_path)
 
-housing = load_housing_data
+housing = load_housing_data()
 
 from sklearn.model_selection import train_test_split
 
@@ -63,7 +64,7 @@ housing = strat_train_set.copy()
 housing.plot(kind="scatter", x="longitude", y="latitude")
 housing.plot(kind="scatter", x="longitude", y="latitude", alpha=0.1)
 
-corr_matrix = housing.corr()
+corr_matrix = housing.corr(numeric_only=True)
 corr_matrix["median_house_value"].sort_values(ascending=False)
 housing["rooms_per_household"] = housing["total_rooms"]/housing["households"]
 housing["bedrooms_per_room"] = housing["total_bedrooms"]/housing["total_rooms"]
@@ -145,7 +146,7 @@ param_grid = [
   ]
 
 forest_reg = RandomForestRegressor(random_state=42)
-# train across 5 folds, that's a total of (12+6)*5=90 rounds of training 
+# train across 5 folds, that's a total of (12+6)*5=90 rounds of training
 grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
                            scoring='neg_mean_squared_error', return_train_score=True)
 grid_search.fit(housing_prepared, housing_labels)
